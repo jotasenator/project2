@@ -73,3 +73,11 @@ form button[type="submit"] {
 form button[type="submit"]:hover {
   background-color: #0069d9;
 }
+h1,
+h2 {
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 50px;
+}

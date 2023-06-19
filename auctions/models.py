@@ -8,7 +8,7 @@ class User(AbstractUser):
 class Listing(models.Model):
     title = models.CharField(max_length=64, default='')
     description = models.TextField(blank=True, default='')
-    starting_bid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    starting_bid = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Starting bid: ($US)")
     image_url = models.URLField(default='')
     category = models.CharField(max_length=64, default='')
     active = models.BooleanField(default=True)
