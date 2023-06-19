@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .models import User
+from django.contrib.auth.decorators import login_required
 
 
 def index(request):
@@ -61,3 +62,23 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+
+@login_required
+def create(request):
+    return render(request, "auctions/create.html")
+
+@login_required
+def bids(request):
+    return render(request,"auctions/bids.html")
+
+@login_required
+def wishlist(request):
+    return render(request,"auctions/wishlist.html")
+
+@login_required
+def purchase(request):
+    return render(request,"auctions/purchase.html")
+
+@login_required
+def profile(request):
+    return render(request, "auctions/profile.html")
