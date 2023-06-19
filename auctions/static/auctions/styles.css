@@ -1,3 +1,32 @@
 body {
-    padding: 10px;
+  padding: 10px;
+}
+
+.card {
+  height: 400px;
+  width: 300px;
+  margin-bottom: 30px;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid #007bff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+}
+
+.card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+.card-img-top {
+  height: 200px;
+  object-fit: cover;
+  transition: transform 0.2s ease-in-out;
+}
+.card-body {
+  position: absolute;
+  bottom: 0;
+}
+
+.card-text {
+  font-style: italic;
 }
