@@ -2,6 +2,7 @@
 
 {% block body %}
   <h2>Go for: <u>{{ listing.title }}</u></h2>
+  
   <div class="row justify-content-center">
     <div class="col-md-6">
       <div class="card mb-3 mx-auto mb-5" style="width: 18rem">
@@ -25,11 +26,14 @@
       {% else %}
         <form method="post">
           {% csrf_token %}
+          {% if request.user != listing.creator %}
           <label for="bid_amount">Enter your bid:</label>
           <!-- starting bid with statring value and can not go under -->
           <input type="number" name="bid_amount" id="bid_amount" min="{{ listing.starting_bid }}" value="{{ listing.starting_bid }}" />
-
           <input type="submit" value="Place Bid" />
+          {% else %}
+          <p>Bid started at:<span class="us-dollar">US$</span>{{listing.starting_bid}}</p>
+          {% endif %}
           <p>Time remaining: <span id="time_remaining">{{ time_remaining }}</span></p>
         </form>
       {% endif %}

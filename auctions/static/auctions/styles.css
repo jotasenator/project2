@@ -110,9 +110,20 @@ h2 {
   border-radius: 10px;
 }
 
+ul.list-group a{
+  text-decoration: none;
+}
+
 .list-group-item {
   background-color: #f8f9fa;
   border-color: #007bff;
+}
+
+.list-group-item:hover {
+  background-color: lightgrey;
+}
+.list-group-item a {
+  color: inherit;
 }
 
 .badge-primary {
