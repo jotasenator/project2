@@ -8,11 +8,11 @@
 <div class="row">
   {% for listing in listings %}
   <div class="col-sm-6 col-md-4 col-lg-3">
-    <a
-      href="{% url 'listing' listing.id %}"
-      class="text-decoration-none text-dark"
-    >
-      <div class="card mb-3 mx-auto mb-5">
+    
+    <div class="card mb-3 mx-auto mb-5">
+        <div class="card-description" data-description="{{ listing.description }}">Item description</div>
+        <a
+        href="{% url 'listing' listing.id %}" class="text-decoration-none text-dark" >
         <img
           src="{{ listing.image_url }}"
           class="card-img-top"
@@ -33,4 +33,24 @@
   </div>
   {% endfor %}
 </div>
+<div id="description-box">{{ listing.description }}</div>
+
+<script>
+
+const cardDescriptions = document.querySelectorAll(".card-description");
+const descriptionBox = document.getElementById("description-box");
+
+cardDescriptions.forEach((cardDescription) => {
+  cardDescription.addEventListener("mouseover", (event) => {
+    const description = event.target.getAttribute("data-description");
+    descriptionBox.textContent = description;
+    descriptionBox.style.display = "block";
+  });
+
+  cardDescription.addEventListener("mouseout", () => {
+    descriptionBox.style.display = "none";
+  });
+});
+
+</script>
 {% endblock %}
