@@ -21,7 +21,7 @@
 
     <div class="col-md-6">
       {% if winner %}
-        <p>The winner is: {{ winner.username }}</p>
+        <p class="winner">The winner was: {{ winner.username }} !!</p>
       {% else %}
         <form method="post">
           {% csrf_token %}

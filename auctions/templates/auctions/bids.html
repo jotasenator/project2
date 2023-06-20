@@ -1,11 +1,21 @@
 {% extends "auctions/layout.html" %}
+{% load custom_filters %}
 
 {% block body %}
   <h2>My Bids</h2>
   <ul class="list-group">
     {% for bid in bids %}
-      <li class="list-group-item">
+      <li class="list-group-item d-flex justify-content-between align-items-center">
         {{ bid.listing.title }} - ${{ bid.bid_amount }}
+        {% with winner=winners|get_item:bid.listing.id %}
+          {% if winner %}
+            {% if winner == request.user %}
+              <span class="badge badge-primary badge-pill">Me, Myself and I :)</span>
+            {% else %}
+              <span class="badge badge-primary badge-pill">{{ winner.username }}</span>
+            {% endif %}
+          {% endif %}
+        {% endwith %}
       </li>
     {% empty %}
       <li class="list-group-item">No bids yet.</li>

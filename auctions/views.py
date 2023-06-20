@@ -87,36 +87,29 @@ def create(request):
 
 
 @login_required
-def bids(request):
-    bids = Bid.objects.filter(bidder=request.user)
-    return render(request, "auctions/bids.html", {"bids": bids})
-
-
-@login_required
 def wishlist(request):
     return render(request, "auctions/wishlist.html")
 
 
-@login_required
-def purchase(request):
-    return render(request, "auctions/purchase.html")
+# winner calculation for using on listing and bids functions
+def get_winner(listing):
+    if timezone.now() > listing.deadline:
+        all_bids = Bid.objects.filter(listing=listing)
+        if all_bids:
+            winning_bid = all_bids.order_by("-bid_amount").first()
+            winner = winning_bid.bidder
+            return winner
+    return None
 
 
 def listing(request, listing_id):
     listing = Listing.objects.get(id=listing_id)
     deadline_str = listing.deadline.isoformat()
     time_remaining = listing.deadline - timezone.now()
-    if time_remaining.total_seconds() > 0:
-        time_remaining_str = str(time_remaining).split(".")[0]
-        winner = None
-    else:
+    time_remaining_str = str(time_remaining).split(".")[0]
+    if time_remaining.total_seconds() <= 0:
         time_remaining_str = "Bidding has ended"
-        bids = Bid.objects.filter(listing=listing)
-        if bids:
-            winning_bid = bids.order_by("-bid_amount").first()
-            winner = winning_bid.bidder
-        else:
-            winner = None
+    winner = get_winner(listing)
 
     if request.method == "POST":
         bid_amount = request.POST["bid_amount"]
@@ -136,3 +129,14 @@ def listing(request, listing_id):
         },
     )
 
+
+@login_required
+def bids(request):
+    bids = Bid.objects.filter(bidder=request.user)
+    winners = {}
+    for bid in bids:
+        listing = bid.listing
+        winner = get_winner(listing)
+        if winner:
+            winners[listing.id] = winner
+    return render(request, "auctions/bids.html", {"bids": bids, "winners": winners})
