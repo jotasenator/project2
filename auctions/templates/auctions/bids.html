@@ -1,7 +1,14 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>My Bids</h2>
-
-    TODO
+  <h2>My Bids</h2>
+  <ul class="list-group">
+    {% for bid in bids %}
+      <li class="list-group-item">
+        {{ bid.listing.title }} - ${{ bid.bid_amount }}
+      </li>
+    {% empty %}
+      <li class="list-group-item">No bids yet.</li>
+    {% endfor %}
+  </ul>
 {% endblock %}
