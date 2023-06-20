@@ -81,3 +81,8 @@ h2 {
 h2 {
   margin-bottom: 50px;
 }
+
+.us-dollar{
+  vertical-align: super;
+  font-size: smaller;
+}

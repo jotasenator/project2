@@ -9,6 +9,8 @@ from django.contrib.auth.decorators import login_required
 
 from .forms import ListingForm
 
+from django.utils import timezone
+
 
 def index(request):
     listings = Listing.objects.filter(active=True)
@@ -98,3 +100,39 @@ def wishlist(request):
 @login_required
 def purchase(request):
     return render(request, "auctions/purchase.html")
+
+
+def listing(request, listing_id):
+    listing = Listing.objects.get(id=listing_id)
+    deadline_str = listing.deadline.isoformat()
+    time_remaining = listing.deadline - timezone.now()
+    if time_remaining.total_seconds() > 0:
+        time_remaining_str = str(time_remaining).split(".")[0]
+        winner = None
+    else:
+        time_remaining_str = "Bidding has ended"
+        bids = Bid.objects.filter(listing=listing)
+        if bids:
+            winning_bid = bids.order_by("-bid_amount").first()
+            winner = winning_bid.bidder
+        else:
+            winner = None
+
+    if request.method == "POST":
+        bid_amount = request.POST["bid_amount"]
+        bidder = request.user
+        bid = Bid(bid_amount=bid_amount, bidder=bidder, listing=listing)
+        bid.save()
+        return redirect("listing", listing_id=listing_id)
+
+    return render(
+        request,
+        "auctions/listing.html",
+        {
+            "listing": listing,
+            "deadline_str": deadline_str,
+            "time_remaining": time_remaining_str,
+            "winner": winner,
+        },
+    )
+

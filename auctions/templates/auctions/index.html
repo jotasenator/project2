@@ -3,29 +3,33 @@
 
 {% if not listings %}
 <h1>There is none. Let's go !!</h1>
-
 {% endif %}
 
 <div class="row">
   {% for listing in listings %}
   <div class="col-sm-6 col-md-4 col-lg-3">
-    <div class="card mb-3 mx-auto mb-5">
-      <img
-        src="{{ listing.image_url }}"
-        class="card-img-top"
-        alt="{{ listing.title }}"
-      />
-      <div class="card-body">
-        <h5 class="card-title"><b>{{ listing.title }}</b></h5>
-        <p class="card-text">
-          <b>Starting bid:</b> <span>US$</span> {{ listing.starting_bid }}
-        </p>
-        <p class="card-text"><b>Category:</b> {{ listing.category }}</p>
-        <p class="card-text">
-          <b>Created by:</b> {{ listing.creator.username }}
-        </p>
+    <a
+      href="{% url 'listing' listing.id %}"
+      class="text-decoration-none text-dark"
+    >
+      <div class="card mb-3 mx-auto mb-5">
+        <img
+          src="{{ listing.image_url }}"
+          class="card-img-top"
+          alt="{{ listing.title }}"
+        />
+        <div class="card-body">
+          <h5 class="card-title"><b>{{ listing.title }}</b></h5>
+          <p class="card-text">
+            <b>Starting bid:</b> <span class="us-dollar">US$</span>{{ listing.starting_bid }}
+          </p>
+          <p class="card-text"><b>Category:</b> {{ listing.category }}</p>
+          <p class="card-text">
+            <b>Created by:</b> {{ listing.creator.username }}
+          </p>
+        </div>
       </div>
-    </div>
+    </a>
   </div>
   {% endfor %}
 </div>

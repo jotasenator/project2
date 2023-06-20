@@ -1,0 +1,66 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+  <h2>Go for: <u>{{ listing.title }}</u></h2>
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card mb-3 mx-auto mb-5" style="width: 18rem">
+        <img
+          src="{{ listing.image_url }}"
+          class="card-img-top"
+          alt="{{ listing.title }}"
+        />
+        <div class="card-body">
+          <h5 class="card-title">{{ listing.title }}</h5>
+          <p class="card-text">Starting bid: <span class="us-dollar">US$</span>{{ listing.starting_bid }}</p>
+          <p class="card-text">Category: {{ listing.category }}</p>
+          <p class="card-text">Created by: {{ listing.creator.username }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      {% if winner %}
+        <p>The winner is: {{ winner.username }}</p>
+      {% else %}
+        <form method="post">
+          {% csrf_token %}
+          <label for="bid_amount">Enter your bid:</label>
+          <!-- starting bid with statring value and can not go under -->
+          <input type="number" name="bid_amount" id="bid_amount" min="{{ listing.starting_bid }}" value="{{ listing.starting_bid }}" />
+
+          <input type="submit" value="Place Bid" />
+          <p>Time remaining: <span id="time_remaining">{{ time_remaining }}</span></p>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Place script here -->
+  <script>
+    // Set deadline
+    const deadline = new Date("{{ deadline_str }}");
+
+    // Update time remaining at regular intervals
+    setInterval(updateTimeRemaining, 1000);
+
+    function updateTimeRemaining() {
+      // Get current time
+      const now = new Date();
+      //console.log("Deadline:", deadline);
+
+      // Calculate time remaining in milliseconds
+      let timeRemaining = deadline - now;
+
+      // Convert time remaining to desired format
+      const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+      // Update innerHTML of time_remaining element
+      document.getElementById("time_remaining").innerHTML =
+        days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+    }
+  </script>
+{% endblock %}
