@@ -10,7 +10,7 @@
         {{ bid.listing.title }} - ${{ bid.bid_amount }}
         {% with winner=winners|get_item:bid.listing.id %}
           {% if winner %}
-            <span class="badge badge-primary badge-pill">{{ winner.username }}</span>
+            <span class="badge badge-primary badge-pill ">Winner: <span class="gold">{{ winner.username }}</span>
             {% endif %}
         {% endwith %}
         </li>
