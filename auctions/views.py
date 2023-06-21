@@ -93,13 +93,15 @@ def wishlist(request):
 
 # winner calculation for using on listing and bids functions
 def get_winner(listing):
+    winner = None
+    winner_bid_amount = None
     if timezone.now() > listing.deadline:
         all_bids = Bid.objects.filter(listing=listing)
         if all_bids:
             winning_bid = all_bids.order_by("-bid_amount").first()
             winner = winning_bid.bidder
-            return winner
-    return None
+            winner_bid_amount = winning_bid.bid_amount
+    return winner, winner_bid_amount
 
 
 def listing(request, listing_id):
@@ -109,7 +111,7 @@ def listing(request, listing_id):
     time_remaining_str = str(time_remaining).split(".")[0]
     if time_remaining.total_seconds() <= 0:
         time_remaining_str = "Bidding has ended"
-    winner = get_winner(listing)
+    winner, winner_bid_amount = get_winner(listing)
 
     if request.method == "POST":
         bid_amount = request.POST["bid_amount"]
@@ -126,6 +128,7 @@ def listing(request, listing_id):
             "deadline_str": deadline_str,
             "time_remaining": time_remaining_str,
             "winner": winner,
+            "winner_bid_amount": winner_bid_amount,
         },
     )
 

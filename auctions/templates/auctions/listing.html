@@ -23,6 +23,7 @@
     <div class="col-md-6">
       {% if winner %}
         <p class="winner">The winner was: {{ winner.username }} !!</p>
+        <div class="winning-bid-amount"><span class="us-dollar">$US</span>{{winner_bid_amount}}</div>
       {% else %}
         <form method="post">
           {% csrf_token %}

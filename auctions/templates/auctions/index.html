@@ -11,8 +11,7 @@
     
     <div class="card mb-3 mx-auto mb-5">
         <div class="card-description" data-description="{{ listing.description }}">Item description</div>
-        <a
-        href="{% url 'listing' listing.id %}" class="text-decoration-none text-dark" >
+        <a href="{% url 'listing' listing.id %}" class="text-decoration-none text-dark" >
         <img
           src="{{ listing.image_url }}"
           class="card-img-top"

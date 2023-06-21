@@ -26,6 +26,7 @@ body {
 .card-body {
   position: absolute;
   bottom: 0;
+  width: 100%;
 }
 .card-title {
   color: #007bff;
@@ -148,5 +149,11 @@ ul.list-group a{
 
 .gold{
   color: gold;
+}
+
+.winning-bid-amount{
+  
+  font-size: 50px;
+  color: blue;
 }
 
