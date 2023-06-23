@@ -11,6 +11,8 @@ from .forms import ListingForm
 
 from django.utils import timezone
 
+from django.db.models import Subquery, OuterRef
+
 
 def index(request):
     listings = Listing.objects.filter(active=True)
@@ -161,7 +163,19 @@ def listing(request, listing_id):
 
 @login_required
 def bids(request):
-    bids = Bid.objects.filter(bidder=request.user)
+    #Get all the bids
+    #bids = Bid.objects.filter(bidder=request.user)
+
+    # Get only the most recent bid for each listing
+    bids = Bid.objects.filter(
+        bidder=request.user,
+        id=Subquery(
+            Bid.objects.filter(
+                bidder=request.user,
+                listing=OuterRef('listing')
+            ).order_by('-id').values('id')[:1]
+        )
+    )
     winners = {}
     for bid in bids:
         listing = bid.listing
