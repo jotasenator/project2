@@ -47,14 +47,7 @@ class Bid(models.Model):
 
 
 class Comment(models.Model):
-    text = models.TextField(default="")
-    commenter = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="comments", blank=True, null=True
-    )
-    listing = models.ForeignKey(
-        Listing,
-        on_delete=models.CASCADE,
-        related_name="comments",
-        blank=True,
-        null=True,
-    )
+    text = models.TextField(default='')
+    user = models.ForeignKey(User, on_delete=models.CASCADE,default=None)
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE,default=None)
+    created_at = models.DateTimeField(default=timezone.now())

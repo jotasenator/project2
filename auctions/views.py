@@ -109,6 +109,23 @@ def get_winner(listing):
 def listing(request, listing_id):
     listing = Listing.objects.get(id=listing_id)
 
+    if request.method == "POST":
+        # Check which form was submitted
+        form_type = request.POST.get("form_type")
+
+        if form_type == "comment":
+            # Handle comment form submission
+            comment_text = request.POST["comment_text"]
+            comment = Comment(text=comment_text, user=request.user, listing=listing)
+            comment.save()
+        elif form_type == "bid":
+            # Handle bid form submission
+            bid_amount = request.POST["bid_amount"]
+            bid = Bid(bid_amount=bid_amount, bidder=request.user, listing=listing)
+            bid.save()
+
+    comments = Comment.objects.filter(listing=listing)
+
     # Calculate the current highest bid
     current_highest_bid = listing.bids.order_by("-bid_amount").first()
     if current_highest_bid:
@@ -124,7 +141,7 @@ def listing(request, listing_id):
         # Extend the deadline by 3 hours
         listing.deadline += timedelta(hours=3)
         listing.save()
-    
+
     # Check if there is a winner and if the bidding has ended
     winner, winner_bid_amount = get_winner(listing)
     if winner and timezone.now() > listing.deadline:
@@ -139,12 +156,12 @@ def listing(request, listing_id):
         time_remaining_str = "Bidding has ended"
     winner, winner_bid_amount = get_winner(listing)
 
-    if request.method == "POST":
-        bid_amount = request.POST["bid_amount"]
-        bidder = request.user
-        bid = Bid(bid_amount=bid_amount, bidder=bidder, listing=listing)
-        bid.save()
-        return redirect("listing", listing_id=listing_id)
+    # if request.method == "POST":
+    #     bid_amount = request.POST["bid_amount"]
+    #     bidder = request.user
+    #     bid = Bid(bid_amount=bid_amount, bidder=bidder, listing=listing)
+    #     bid.save()
+    #     return redirect("listing", listing_id=listing_id)
 
     return render(
         request,
@@ -157,24 +174,24 @@ def listing(request, listing_id):
             "winner_bid_amount": winner_bid_amount,
             "current_highest_bid_amount": current_highest_bid_amount,
             "bid_difference": bid_difference,
+            "comments": comments,
         },
     )
 
 
 @login_required
 def bids(request):
-    #Get all the bids
-    #bids = Bid.objects.filter(bidder=request.user)
+    # Get all the bids
+    # bids = Bid.objects.filter(bidder=request.user)
 
     # Get only the most recent bid for each listing
     bids = Bid.objects.filter(
         bidder=request.user,
         id=Subquery(
-            Bid.objects.filter(
-                bidder=request.user,
-                listing=OuterRef('listing')
-            ).order_by('-id').values('id')[:1]
-        )
+            Bid.objects.filter(bidder=request.user, listing=OuterRef("listing"))
+            .order_by("-id")
+            .values("id")[:1]
+        ),
     )
     winners = {}
     for bid in bids:
@@ -184,16 +201,17 @@ def bids(request):
             winners[listing.id] = winner
     return render(request, "auctions/bids.html", {"bids": bids, "winners": winners})
 
+
 @login_required
 def end_bidding(request, listing_id):
     # Get the listing object
     listing = Listing.objects.get(id=listing_id)
-    
+
     # Check if the current user is the creator of the listing and if the bidding is still active
     if request.user == listing.creator and timezone.now() < listing.deadline:
         # Set the deadline to be equal to the current time
         listing.deadline = timezone.now()
         listing.save()
-    
+
     # Redirect back to the listing page
-    return redirect('listing', listing_id=listing_id)
+    return redirect("listing", listing_id=listing_id)

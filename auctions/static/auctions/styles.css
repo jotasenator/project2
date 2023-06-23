@@ -111,7 +111,7 @@ h2 {
   border-radius: 10px;
 }
 
-ul.list-group a{
+ul.list-group a {
   text-decoration: none;
 }
 
@@ -147,13 +147,44 @@ ul.list-group a{
   animation: winner-animation 2s infinite;
 }
 
-.gold{
+.gold {
   color: gold;
 }
 
-.winning-bid-amount{
-  
+.winning-bid-amount {
   font-size: 50px;
   color: blue;
 }
 
+/* Add styles for the comments section */
+.comments-section {
+  margin-top: 30px;
+}
+
+.comments-section h3 {
+  margin-bottom: 20px;
+}
+
+.comments-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.comments-section li {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.comments-section li p:first-of-type {
+  font-weight: bold;
+}
+
+.comments-section li.odd {
+  text-align: left;
+}
+
+.comments-section li.even {
+  text-align: right;
+}

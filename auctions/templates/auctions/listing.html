@@ -55,9 +55,33 @@
     </div>
   </div>
 
+  <!-- comments -->
+  <div class="comments-section">
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="form_type" value="comment" />
+      <label for="comment_text">Add a comment:</label>
+      <textarea name="comment_text" id="comment_text"></textarea>
+      <input id="submit-comment" type="submit" value="Submit Comment" />
+    </form>
+
+    <h3>Comments</h3>
+    <ul>
+        {% for comment in comments %}
+          <li class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+            <p>{{ comment.text }}</p>
+            <p>By: {{ comment.user.username }}</p>
+         </li>
+        {% empty %}
+          <li>No comments yet.</li>
+        {% endfor %}
+    </ul> 
+  </div>
+  
+  <!-- comments -->
+
   <div id="description-box">{{ listing.description }}</div>
 
-  <!-- Place script here -->
   <script>
     // Set deadline
     const deadline = new Date("{{ deadline_str }}");
@@ -100,5 +124,13 @@
         descriptionBox.style.display = "none";
       });
     });
+
+    const submitCommentButton = document.querySelector("#submit-comment")
+    submitCommentButton.addEventListener("click", function(){
+      const lastElement = document.querySelector(".comments-section li:last-of-type");
+      if (lastElement) {
+        lastElement.scrollIntoView();
+      }
+    })
   </script>
 {% endblock %}
