@@ -142,5 +142,4 @@ def bids(request):
         winner, _ = get_winner(listing)
         if winner:
             winners[listing.id] = winner
-    print(f"Winners: {winners}")
     return render(request, "auctions/bids.html", {"bids": bids, "winners": winners})
