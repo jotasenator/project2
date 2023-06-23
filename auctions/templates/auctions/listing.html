@@ -5,7 +5,8 @@
   
   <div class="row justify-content-center">
     <div class="col-md-6">
-      <div class="card mb-3 mx-auto mb-5" style="width: 18rem">
+      <div class="card mb-3 mx-auto mb-5" >
+        <div class="card-description" data-description="{{ listing.description }}">Item description</div>
         <img
           src="{{ listing.image_url }}"
           class="card-img-top"
@@ -15,7 +16,7 @@
           <h5 class="card-title">{{ listing.title }}</h5>
           <p class="card-text">Starting bid: <span class="us-dollar">US$</span>{{ listing.starting_bid }}</p>
           <p class="card-text">Category: {{ listing.category }}</p>
-          <p class="card-text">Created by: {{ listing.creator.username }}</p>
+          <p class="card-text">Created by: {{ listing.creator.username|truncatechars:19 }}</p>
         </div>
       </div>
     </div>
@@ -54,6 +55,8 @@
     </div>
   </div>
 
+  <div id="description-box">{{ listing.description }}</div>
+
   <!-- Place script here -->
   <script>
     // Set deadline
@@ -82,5 +85,20 @@
         timeRemainingElement.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
       }
     }
+
+    const cardDescriptions = document.querySelectorAll(".card-description");
+    const descriptionBox = document.getElementById("description-box");
+
+    cardDescriptions.forEach((cardDescription) => {
+      cardDescription.addEventListener("mouseover", (event) => {
+        const description = event.target.getAttribute("data-description");
+        descriptionBox.textContent = description;
+        descriptionBox.style.display = "block";
+      });
+
+      cardDescription.addEventListener("mouseout", () => {
+        descriptionBox.style.display = "none";
+      });
+    });
   </script>
 {% endblock %}

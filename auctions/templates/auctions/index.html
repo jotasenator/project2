@@ -24,7 +24,7 @@
           </p>
           <p class="card-text"><b>Category:</b> {{ listing.category }}</p>
           <p class="card-text">
-            <b>Created by:</b> {{ listing.creator.username }}
+            <b>Created by:</b> {{ listing.creator.username|truncatechars:19 }}
           </p>
         </div>
       </div>
