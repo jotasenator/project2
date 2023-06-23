@@ -30,7 +30,7 @@
           {% if request.user != listing.creator %}
           <label for="bid_amount">Enter your bid:</label>
           <!-- starting bid with statring value and can not go under -->
-          <input type="number" name="bid_amount" id="bid_amount" min="{{ current_highest_bid_amount }}" value="{{ current_highest_bid_amount }}" />
+          <input type="number" name="bid_amount" id="bid_amount" min="{{ current_highest_bid_amount }}" value="{{ current_highest_bid_amount }}" step="0.01"/>
           <input type="submit" value="Place Bid" />
           {% else %}
           <p>Bid started at:<span class="us-dollar">US$</span>{{listing.starting_bid}}</p>
