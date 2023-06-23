@@ -106,10 +106,24 @@ def get_winner(listing):
 
 def listing(request, listing_id):
     listing = Listing.objects.get(id=listing_id)
+
+      # Check if the current time is past the deadline and if there are no bids
+    if timezone.now() > listing.deadline and not listing.bids.exists():
+        # Extend the deadline by 3 hours
+        listing.deadline += timedelta(hours=3)
+        listing.save()
+    
+    # Check if there is a winner and if the bidding has ended
+    winner, winner_bid_amount = get_winner(listing)
+    if winner and timezone.now() > listing.deadline:
+        # Set the active field to False
+        listing.active = False
+        listing.save()
+
     deadline_str = listing.deadline.isoformat()
     time_remaining = listing.deadline - timezone.now()
     time_remaining_str = str(time_remaining).split(".")[0]
-    if time_remaining.total_seconds() <= 0:
+    if time_remaining.total_seconds() == 0:
         time_remaining_str = "Bidding has ended"
     winner, winner_bid_amount = get_winner(listing)
 
@@ -143,3 +157,17 @@ def bids(request):
         if winner:
             winners[listing.id] = winner
     return render(request, "auctions/bids.html", {"bids": bids, "winners": winners})
+
+@login_required
+def end_bidding(request, listing_id):
+    # Get the listing object
+    listing = Listing.objects.get(id=listing_id)
+    
+    # Check if the current user is the creator of the listing and if the bidding is still active
+    if request.user == listing.creator and timezone.now() < listing.deadline:
+        # Set the deadline to be equal to the current time
+        listing.deadline = timezone.now()
+        listing.save()
+    
+    # Redirect back to the listing page
+    return redirect('listing', listing_id=listing_id)

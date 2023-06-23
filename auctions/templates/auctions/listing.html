@@ -38,6 +38,15 @@
           <p>Time remaining: <span id="time_remaining">{{ time_remaining }}</span></p>
         </form>
       {% endif %}
+
+      {% if request.user == listing.creator %}
+        {% if not winner %}
+          <form class="mt-5" method="post" action="{% url 'end_bidding' listing.id %}">
+            {% csrf_token %}
+            <input type="submit" value="End Bidding" />
+          </form>
+        {% endif %}
+      {% endif %}
     </div>
   </div>
 
