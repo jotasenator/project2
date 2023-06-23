@@ -26,17 +26,21 @@
     <form method="post">
       {% csrf_token %}
       {% if request.user != listing.creator %}
+
+      <!-- this ensure that the form_type field is included in the POST data when the form is submitted. This allows listing function to correctly identify that the bid form was submitted and handle the form submission accordingly.-->
+      <input type="hidden" name="form_type" value="bid" />
+
       <label for="bid_amount">Enter your bid:</label>
-      <!-- starting bid with statring value and can not go under -->
+      <!-- starting bid with starting value and can not go under -->
       <input type="number" name="bid_amount" id="bid_amount" min="{{ current_highest_bid_amount }}"
         value="{{ current_highest_bid_amount }}" step="0.01" />
       <input type="submit" value="Place Bid" />
       {% else %}
       <p>Bid started at:<span class="us-dollar">US$</span>{{listing.starting_bid}}</p>
-      {% if listing.starting_bid != current_highest_bid_amount %}
+        {% if listing.starting_bid != current_highest_bid_amount %}
       <p>Highest bid so far: <span class="us-dollar">US$</span>{{current_highest_bid_amount}} <span
           class="pl-5"><b><span class="us-dollar">US$</span>{{bid_difference}}</span></b><i>&#x2191;</i></p>
-      {% endif %}
+        {% endif %}
       {% endif %}
       <p>Time remaining: <span id="time_remaining">{{ time_remaining }}</span></p>
 
@@ -44,16 +48,16 @@
     {% endif %}
 
     {% if request.user == listing.creator %}
-    {% if not winner %}
-    {% if listing.active %}
-    <form class="mt-5" method="post" action="{% url 'end_bidding' listing.id %}">
-      {% csrf_token %}
-      <input type="submit" value="End Bidding" />
-    </form>
-    {% else %}
-    <p class="alert alert-danger">The bidding has ended and there were no bids, nor winners.</p>
-    {% endif %}
-    {% endif %}
+      {% if not winner %}
+        {% if listing.active %}
+          <form class="mt-5" method="post" action="{% url 'end_bidding' listing.id %}">
+            {% csrf_token %}
+           <input type="submit" value="End Bidding" />
+          </form>
+          {% else %}
+          <p class="alert alert-danger">The bidding has ended and there were no bids, nor winners.</p>
+        {% endif %}
+      {% endif %}
     {% endif %}
 
   </div>

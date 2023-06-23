@@ -50,7 +50,7 @@ class Comment(models.Model):
     text = models.TextField(default='')
     user = models.ForeignKey(User, on_delete=models.CASCADE,default=None)
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE,default=None)
-    created_at = models.DateTimeField(default=timezone.now())
+    created_at = models.DateTimeField(default=timezone.now)
 
 
 class Watchlist(models.Model):
