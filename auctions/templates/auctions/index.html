@@ -1,4 +1,12 @@
 {% extends "auctions/layout.html" %} {% block body %}
+
+<style>
+  /* Hide Watchlist button by default for avoiding the cache of the previous value of the Watchlists buttons*/
+  .watchlist-button {
+    display: none;
+  }
+</style>
+
 <h2>Active Listings</h2>
 
 {% if not listings %}
@@ -7,10 +15,21 @@
 
 <div class="row">
   {% for listing in listings %}
-  <div class="col-sm-6 col-md-4 col-lg-3">
-    
+  <div class="col-sm-6 col-md-4 col-lg-3">    
     <div class="card mb-3 mx-auto mb-5">
         <div class="card-description" data-description="{{ listing.description }}">Item description</div>
+        <div>
+        {% if user.is_authenticated %}
+          <form class="border-0 p-0 br-0" method="post" action="{% url 'toggle_watchlist' listing.id %}">
+            {% csrf_token %}
+            {% if listing in watchlist %}
+              <input class=" rounded-0 watchlist-button" type="submit" value="Remove from Watchlist" />
+            {% else %}
+              <input class=" rounded-0 watchlist-button" type="submit" value="Add to Watchlist" />
+            {% endif %}
+          </form>
+        {% endif %}
+      </div>
         <a href="{% url 'listing' listing.id %}" class="text-decoration-none text-dark" >
         <img
           src="{{ listing.image_url }}"
@@ -50,6 +69,17 @@ cardDescriptions.forEach((cardDescription) => {
     descriptionBox.style.display = "none";
   });
 });
+
+  window.addEventListener('pageshow', function(event) {
+    if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+      location.reload();
+    } else {
+      // Show Watchlist button after page has finished reloading
+      document.querySelectorAll('.watchlist-button').forEach(function(button) {
+        button.style.display = 'inline-block';
+      });
+    }
+  });
 
 </script>
 {% endblock %}

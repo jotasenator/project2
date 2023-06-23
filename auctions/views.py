@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from .models import User, Listing, Bid, Comment
+from .models import User, Listing, Bid, Comment, Watchlist
 from django.contrib.auth.decorators import login_required
 
 from .forms import ListingForm
@@ -16,7 +16,30 @@ from django.db.models import Subquery, OuterRef
 
 def index(request):
     listings = Listing.objects.filter(active=True)
-    return render(request, "auctions/index.html", {"listings": listings})
+    if request.user.is_authenticated:
+        watchlist = Watchlist.objects.filter(user=request.user).first()
+        if watchlist:
+            watchlist_listings = watchlist.listings.all()
+        else:
+            watchlist_listings = []
+    else:
+        watchlist_listings = []
+
+    return render(
+        request,
+        "auctions/index.html",
+        {
+            "listings": listings,
+            "watchlist": watchlist_listings,
+        },
+    )
+    # was intended in order to eliminate the cache so when we go backward on the browser
+    # we shouldn t see the older value on the sumbit input
+    # need to dig more into this, was donde with javascript
+    # response["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    # response["Pragma"] = "no-cache"
+    # response["Expires"] = "0"
+    # return response
 
 
 def login_view(request):
@@ -89,8 +112,30 @@ def create(request):
 
 
 @login_required
-def wishlist(request):
-    return render(request, "auctions/wishlist.html")
+def watchlist(request):
+    if request.user.is_authenticated:
+        watchlist = Watchlist.objects.filter(user=request.user).first()
+        if watchlist:
+            listings = watchlist.listings.all()
+        else:
+            listings = []
+    else:
+        listings = []
+
+    return render(request, "auctions/watchlist.html", {"listings": listings})
+
+
+@login_required
+def toggle_watchlist(request, listing_id):
+    if request.method == "POST":
+        listing = Listing.objects.get(id=listing_id)
+        watchlist, created = Watchlist.objects.get_or_create(user=request.user)
+        if listing in watchlist.listings.all():
+            watchlist.listings.remove(listing)
+        else:
+            watchlist.listings.add(listing)
+
+    return redirect("watchlist")
 
 
 # winner calculation for using on listing and bids functions
@@ -118,13 +163,13 @@ def listing(request, listing_id):
             comment_text = request.POST["comment_text"]
             comment = Comment(text=comment_text, user=request.user, listing=listing)
             comment.save()
-            return redirect('listing', listing_id=listing_id)
+            return redirect("listing", listing_id=listing_id)
         elif form_type == "bid":
             # Handle bid form submission
             bid_amount = request.POST["bid_amount"]
             bid = Bid(bid_amount=bid_amount, bidder=request.user, listing=listing)
             bid.save()
-            return redirect('listing', listing_id=listing_id)
+            return redirect("listing", listing_id=listing_id)
 
     comments = Comment.objects.filter(listing=listing)
 

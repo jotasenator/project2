@@ -51,3 +51,8 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,default=None)
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE,default=None)
     created_at = models.DateTimeField(default=timezone.now())
+
+
+class Watchlist(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE,default=None)
+    listings = models.ManyToManyField(Listing)
