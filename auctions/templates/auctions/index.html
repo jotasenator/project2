@@ -15,27 +15,26 @@
 
 <div class="row">
   {% for listing in listings %}
-  <div class="col-sm-6 col-md-4 col-lg-3">    
+  <div class="col-sm-6 col-md-4 col-lg-3">
     <div class="card mb-3 mx-auto mb-5">
-        <div class="card-description" data-description="{{ listing.description }}">Item description</div>
-        <div>
+      <div class="card-description" data-description="{{ listing.description }}">
+        Item description
+      </div>
+      <div>
         {% if user.is_authenticated %}
-          <form class="border-0 p-0 br-0" method="post" action="{% url 'toggle_watchlist' listing.id %}">
-            {% csrf_token %}
-            {% if listing in watchlist %}
-              <input class=" rounded-0 watchlist-button" type="submit" value="Remove from Watchlist" />
-            {% else %}
-              <input class=" rounded-0 watchlist-button" type="submit" value="Add to Watchlist" />
-            {% endif %}
-          </form>
+        <form class="border-0 p-0 br-0" method="post" action="{% url 'toggle_watchlist' listing.id %}">
+          {% csrf_token %}
+          {% if listing in watchlist %}
+          <input class="rounded-0 watchlist-button" type="submit" value="Remove from Watchlist" />
+          {% else %}
+          <input class="rounded-0 watchlist-button" type="submit" value="Add to Watchlist" />
+          {% endif %}
+        </form>
         {% endif %}
       </div>
-        <a href="{% url 'listing' listing.id %}" class="text-decoration-none text-dark" >
-        <img
-          src="{{ listing.image_url }}"
-          class="card-img-top"
-          alt="{{ listing.title }}"
-        />
+      {% if user.is_authenticated %}
+      <a href="{% url 'listing' listing.id %}" class="text-decoration-none text-dark">
+        <img src="{{ listing.image_url }}" class="card-img-top" alt="{{ listing.title }}" />
         <div class="card-body">
           <h5 class="card-title"><b>{{ listing.title }}</b></h5>
           <p class="card-text">
@@ -46,40 +45,61 @@
             <b>Created by:</b> {{ listing.creator.username|truncatechars:19 }}
           </p>
         </div>
+      </a>
+      {% else %}
+      <img src="{{ listing.image_url }}" class="card-img-top" alt="{{ listing.title }}" />
+      <div class="card-body">
+        <h5 class="card-title"><b>{{ listing.title }}</b></h5>
+        <p class="card-text">
+          <b>Starting bid:</b> <span class="us-dollar">US$</span>{{ listing.starting_bid }}
+        </p>
+        <p class="card-text"><b>Category:</b> {{ listing.category }}</p>
+        <p class="card-text">
+          <b>Created by:</b> {{ listing.creator.username|truncatechars:19 }}
+        </p>
       </div>
-    </a>
+      {% endif %}
+    </div>
   </div>
   {% endfor %}
 </div>
 <div id="description-box">{{ listing.description }}</div>
 
+
 <script>
 
-const cardDescriptions = document.querySelectorAll(".card-description");
-const descriptionBox = document.getElementById("description-box");
+  const cardDescriptions = document.querySelectorAll( ".card-description" );
+  const descriptionBox = document.getElementById( "description-box" );
 
-cardDescriptions.forEach((cardDescription) => {
-  cardDescription.addEventListener("mouseover", (event) => {
-    const description = event.target.getAttribute("data-description");
-    descriptionBox.textContent = description;
-    descriptionBox.style.display = "block";
-  });
+  cardDescriptions.forEach( ( cardDescription ) =>
+  {
+    cardDescription.addEventListener( "mouseover", ( event ) =>
+    {
+      const description = event.target.getAttribute( "data-description" );
+      descriptionBox.textContent = description;
+      descriptionBox.style.display = "block";
+    } );
 
-  cardDescription.addEventListener("mouseout", () => {
-    descriptionBox.style.display = "none";
-  });
-});
+    cardDescription.addEventListener( "mouseout", () =>
+    {
+      descriptionBox.style.display = "none";
+    } );
+  } );
 
-  window.addEventListener('pageshow', function(event) {
-    if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+  window.addEventListener( 'pageshow', function ( event )
+  {
+    if ( event.persisted || ( window.performance && window.performance.navigation.type === 2 ) )
+    {
       location.reload();
-    } else {
+    } else
+    {
       // Show Watchlist button after page has finished reloading
-      document.querySelectorAll('.watchlist-button').forEach(function(button) {
+      document.querySelectorAll( '.watchlist-button' ).forEach( function ( button )
+      {
         button.style.display = 'inline-block';
-      });
+      } );
     }
-  });
+  } );
 
 </script>
 {% endblock %}
