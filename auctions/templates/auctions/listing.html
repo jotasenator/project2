@@ -34,7 +34,9 @@
           <input type="submit" value="Place Bid" />
           {% else %}
           <p>Bid started at:<span class="us-dollar">US$</span>{{listing.starting_bid}}</p>
-          <p>Highest bid so far: <span class="us-dollar">US$</span>{{current_highest_bid_amount}} <span class="pl-5"><b><span class="us-dollar">US$</span>{{bid_difference}}</span></b><i>&#x2191;</i></p>
+            {% if listing.starting_bid != current_highest_bid_amount %}
+              <p>Highest bid so far: <span class="us-dollar">US$</span>{{current_highest_bid_amount}} <span class="pl-5"><b><span class="us-dollar">US$</span>{{bid_difference}}</span></b><i>&#x2191;</i></p>
+              {% endif %}
           {% endif %}
           <p>Time remaining: <span id="time_remaining">{{ time_remaining }}</span></p>
           
