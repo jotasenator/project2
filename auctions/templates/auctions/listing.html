@@ -64,8 +64,10 @@
       const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
 
       // Update innerHTML of time_remaining element
-      document.getElementById("time_remaining").innerHTML =
-        days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+      const timeRemainingElement = document.getElementById("time_remaining");
+      if (timeRemainingElement) {
+        timeRemainingElement.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
+      }
     }
   </script>
 {% endblock %}
