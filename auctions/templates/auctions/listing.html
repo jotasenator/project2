@@ -123,14 +123,6 @@
       cardDescription.addEventListener("mouseout", () => {
         descriptionBox.style.display = "none";
       });
-    });
-
-    const submitCommentButton = document.querySelector("#submit-comment")
-    submitCommentButton.addEventListener("click", function(){
-      const lastElement = document.querySelector(".comments-section li:last-of-type");
-      if (lastElement) {
-        lastElement.scrollIntoView();
-      }
-    })
+    });   
   </script>
 {% endblock %}

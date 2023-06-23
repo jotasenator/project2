@@ -118,11 +118,13 @@ def listing(request, listing_id):
             comment_text = request.POST["comment_text"]
             comment = Comment(text=comment_text, user=request.user, listing=listing)
             comment.save()
+            return redirect('listing', listing_id=listing_id)
         elif form_type == "bid":
             # Handle bid form submission
             bid_amount = request.POST["bid_amount"]
             bid = Bid(bid_amount=bid_amount, bidder=request.user, listing=listing)
             bid.save()
+            return redirect('listing', listing_id=listing_id)
 
     comments = Comment.objects.filter(listing=listing)
 
