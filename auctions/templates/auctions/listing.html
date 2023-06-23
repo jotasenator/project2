@@ -1,128 +1,137 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-  <h2>Go for: <u>{{ listing.title }}</u></h2>
-  
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card mb-3 mx-auto mb-5" >
-        <div class="card-description" data-description="{{ listing.description }}">Item description</div>
-        <img
-          src="{{ listing.image_url }}"
-          class="card-img-top"
-          alt="{{ listing.title }}"
-        />
-        <div class="card-body">
-          <h5 class="card-title">{{ listing.title }}</h5>
-          <p class="card-text">Starting bid: <span class="us-dollar">US$</span>{{ listing.starting_bid }}</p>
-          <p class="card-text">Category: {{ listing.category }}</p>
-          <p class="card-text">Created by: {{ listing.creator.username|truncatechars:19 }}</p>
-        </div>
+<h2>Go for: <u>{{ listing.title }}</u></h2>
+
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card mb-3 mx-auto mb-5">
+      <div class="card-description" data-description="{{ listing.description }}">Item description</div>
+      <img src="{{ listing.image_url }}" class="card-img-top" alt="{{ listing.title }}" />
+      <div class="card-body">
+        <h5 class="card-title">{{ listing.title }}</h5>
+        <p class="card-text">Starting bid: <span class="us-dollar">US$</span>{{ listing.starting_bid }}</p>
+        <p class="card-text">Category: {{ listing.category }}</p>
+        <p class="card-text">Created by: {{ listing.creator.username|truncatechars:19 }}</p>
       </div>
     </div>
-
-    <div class="col-md-6">
-      {% if winner %}
-        <p class="winner">The winner was: {{ winner.username }} !!</p>
-        <div class="winning-bid-amount"><span class="us-dollar">$US</span>{{winner_bid_amount}}</div>
-      {% else %}
-        <form method="post">
-          {% csrf_token %}
-          {% if request.user != listing.creator %}
-          <label for="bid_amount">Enter your bid:</label>
-          <!-- starting bid with statring value and can not go under -->
-          <input type="number" name="bid_amount" id="bid_amount" min="{{ current_highest_bid_amount }}" value="{{ current_highest_bid_amount }}" step="0.01"/>
-          <input type="submit" value="Place Bid" />
-          {% else %}
-          <p>Bid started at:<span class="us-dollar">US$</span>{{listing.starting_bid}}</p>
-            {% if listing.starting_bid != current_highest_bid_amount %}
-              <p>Highest bid so far: <span class="us-dollar">US$</span>{{current_highest_bid_amount}} <span class="pl-5"><b><span class="us-dollar">US$</span>{{bid_difference}}</span></b><i>&#x2191;</i></p>
-              {% endif %}
-          {% endif %}
-          <p>Time remaining: <span id="time_remaining">{{ time_remaining }}</span></p>
-          
-        </form>
-      {% endif %}
-
-      {% if request.user == listing.creator %}
-        {% if not winner %}
-          <form class="mt-5" method="post" action="{% url 'end_bidding' listing.id %}">
-            {% csrf_token %}
-            <input type="submit" value="End Bidding" />
-          </form>
-        {% endif %}
-      {% endif %}
-    </div>
   </div>
 
-  <!-- comments -->
-  <div class="comments-section">
+  <div class="col-md-6">
+    {% if winner %}
+    <p class="winner">The winner was: {{ winner.username }} !!</p>
+    <div class="winning-bid-amount"><span class="us-dollar">$US</span>{{winner_bid_amount}}</div>
+    {% elif listing.active %}
+
     <form method="post">
       {% csrf_token %}
-      <input type="hidden" name="form_type" value="comment" />
-      <label for="comment_text">Add a comment:</label>
-      <textarea name="comment_text" id="comment_text"></textarea>
-      <input id="submit-comment" type="submit" value="Submit Comment" />
+      {% if request.user != listing.creator %}
+      <label for="bid_amount">Enter your bid:</label>
+      <!-- starting bid with statring value and can not go under -->
+      <input type="number" name="bid_amount" id="bid_amount" min="{{ current_highest_bid_amount }}"
+        value="{{ current_highest_bid_amount }}" step="0.01" />
+      <input type="submit" value="Place Bid" />
+      {% else %}
+      <p>Bid started at:<span class="us-dollar">US$</span>{{listing.starting_bid}}</p>
+      {% if listing.starting_bid != current_highest_bid_amount %}
+      <p>Highest bid so far: <span class="us-dollar">US$</span>{{current_highest_bid_amount}} <span
+          class="pl-5"><b><span class="us-dollar">US$</span>{{bid_difference}}</span></b><i>&#x2191;</i></p>
+      {% endif %}
+      {% endif %}
+      <p>Time remaining: <span id="time_remaining">{{ time_remaining }}</span></p>
+
     </form>
+    {% endif %}
 
-    <h3>Comments</h3>
-    <ul>
-        {% for comment in comments %}
-          <li class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-            <p>{{ comment.text }}</p>
-            <p>By: {{ comment.user.username }}</p>
-         </li>
-        {% empty %}
-          <li>No comments yet.</li>
-        {% endfor %}
-    </ul> 
+    {% if request.user == listing.creator %}
+    {% if not winner %}
+    {% if listing.active %}
+    <form class="mt-5" method="post" action="{% url 'end_bidding' listing.id %}">
+      {% csrf_token %}
+      <input type="submit" value="End Bidding" />
+    </form>
+    {% else %}
+    <p class="alert alert-danger">The bidding has ended and there were no bids, nor winners.</p>
+    {% endif %}
+    {% endif %}
+    {% endif %}
+
   </div>
-  
-  <!-- comments -->
+</div>
 
-  <div id="description-box">{{ listing.description }}</div>
+<!-- comments -->
+<div class="comments-section">
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="form_type" value="comment" />
+    <label for="comment_text">Add a comment:</label>
+    <textarea name="comment_text" id="comment_text"></textarea>
+    <input id="submit-comment" type="submit" value="Submit Comment" />
+  </form>
 
-  <script>
-    // Set deadline
-    const deadline = new Date("{{ deadline_str }}");
+  <h3>Comments</h3>
+  <ul>
+    {% for comment in comments %}
+    <li class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+      <p>{{ comment.text }}</p>
+      <p>By: {{ comment.user.username }}</p>
+    </li>
+    {% empty %}
+    <li>No comments yet.</li>
+    {% endfor %}
+  </ul>
+</div>
 
-    // Update time remaining at regular intervals
-    setInterval(updateTimeRemaining, 1000);
+<!-- comments -->
 
-    function updateTimeRemaining() {
-      // Get current time
-      const now = new Date();
-      //console.log("Deadline:", deadline);
+<div id="description-box">{{ listing.description }}</div>
 
-      // Calculate time remaining in milliseconds
-      let timeRemaining = deadline - now;
+<script>
+  // Set deadline
+  const deadline = new Date( "{{ deadline_str }}" );
 
-      // Convert time remaining to desired format
-      const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+  // Update time remaining at regular intervals
+  setInterval( updateTimeRemaining, 1000 );
 
-      // Update innerHTML of time_remaining element
-      const timeRemainingElement = document.getElementById("time_remaining");
-      if (timeRemainingElement) {
-        timeRemainingElement.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
-      }
+  function updateTimeRemaining ()
+  {
+    // Get current time
+    const now = new Date();
+    //console.log("Deadline:", deadline);
+
+    // Calculate time remaining in milliseconds
+    let timeRemaining = deadline - now;
+
+    // Convert time remaining to desired format
+    const days = Math.floor( timeRemaining / ( 1000 * 60 * 60 * 24 ) );
+    const hours = Math.floor( ( timeRemaining % ( 1000 * 60 * 60 * 24 ) ) / ( 1000 * 60 * 60 ) );
+    const minutes = Math.floor( ( timeRemaining % ( 1000 * 60 * 60 ) ) / ( 1000 * 60 ) );
+    const seconds = Math.floor( ( timeRemaining % ( 1000 * 60 ) ) / 1000 );
+
+    // Update innerHTML of time_remaining element
+    const timeRemainingElement = document.getElementById( "time_remaining" );
+    if ( timeRemainingElement )
+    {
+      timeRemainingElement.innerHTML = days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
     }
+  }
 
-    const cardDescriptions = document.querySelectorAll(".card-description");
-    const descriptionBox = document.getElementById("description-box");
+  const cardDescriptions = document.querySelectorAll( ".card-description" );
+  const descriptionBox = document.getElementById( "description-box" );
 
-    cardDescriptions.forEach((cardDescription) => {
-      cardDescription.addEventListener("mouseover", (event) => {
-        const description = event.target.getAttribute("data-description");
-        descriptionBox.textContent = description;
-        descriptionBox.style.display = "block";
-      });
+  cardDescriptions.forEach( ( cardDescription ) =>
+  {
+    cardDescription.addEventListener( "mouseover", ( event ) =>
+    {
+      const description = event.target.getAttribute( "data-description" );
+      descriptionBox.textContent = description;
+      descriptionBox.style.display = "block";
+    } );
 
-      cardDescription.addEventListener("mouseout", () => {
-        descriptionBox.style.display = "none";
-      });
-    });   
-  </script>
+    cardDescription.addEventListener( "mouseout", () =>
+    {
+      descriptionBox.style.display = "none";
+    } );
+  } );   
+</script>
 {% endblock %}

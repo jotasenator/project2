@@ -13,6 +13,8 @@ from django.utils import timezone
 
 from django.db.models import Subquery, OuterRef
 
+from datetime import timedelta
+
 
 def index(request):
     listings = Listing.objects.filter(active=True)
@@ -186,7 +188,7 @@ def listing(request, listing_id):
     # Check if the current time is past the deadline and if there are no bids
     if timezone.now() > listing.deadline and not listing.bids.exists():
         # Extend the deadline by 3 hours
-        listing.deadline += timedelta(hours=3)
+        listing.active = False
         listing.save()
 
     # Check if there is a winner and if the bidding has ended
