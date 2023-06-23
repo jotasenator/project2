@@ -114,6 +114,9 @@ def listing(request, listing_id):
     else:
         current_highest_bid_amount = listing.starting_bid
 
+    # Calculate the difference between the current highest bid and the starting bid
+    bid_difference = current_highest_bid_amount - listing.starting_bid
+
     # Check if the current time is past the deadline and if there are no bids
     if timezone.now() > listing.deadline and not listing.bids.exists():
         # Extend the deadline by 3 hours
@@ -151,6 +154,7 @@ def listing(request, listing_id):
             "winner": winner,
             "winner_bid_amount": winner_bid_amount,
             "current_highest_bid_amount": current_highest_bid_amount,
+            "bid_difference": bid_difference,
         },
     )
 
