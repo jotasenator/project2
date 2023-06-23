@@ -107,7 +107,14 @@ def get_winner(listing):
 def listing(request, listing_id):
     listing = Listing.objects.get(id=listing_id)
 
-      # Check if the current time is past the deadline and if there are no bids
+    # Calculate the current highest bid
+    current_highest_bid = listing.bids.order_by("-bid_amount").first()
+    if current_highest_bid:
+        current_highest_bid_amount = current_highest_bid.bid_amount
+    else:
+        current_highest_bid_amount = listing.starting_bid
+
+    # Check if the current time is past the deadline and if there are no bids
     if timezone.now() > listing.deadline and not listing.bids.exists():
         # Extend the deadline by 3 hours
         listing.deadline += timedelta(hours=3)
@@ -143,6 +150,7 @@ def listing(request, listing_id):
             "time_remaining": time_remaining_str,
             "winner": winner,
             "winner_bid_amount": winner_bid_amount,
+            "current_highest_bid_amount": current_highest_bid_amount,
         },
     )
 
