@@ -156,6 +156,16 @@ def get_winner(listing):
 def listing(request, listing_id):
     listing = Listing.objects.get(id=listing_id)
 
+    # Get the user's watchlist
+    if request.user.is_authenticated:
+        watchlist = Watchlist.objects.filter(user=request.user).first()
+        if watchlist:
+            watchlist_listings = watchlist.listings.all()
+        else:
+            watchlist_listings = []
+    else:
+        watchlist_listings = []
+
     if request.method == "POST":
         # Check which form was submitted
         form_type = request.POST.get("form_type")
@@ -224,6 +234,7 @@ def listing(request, listing_id):
             "current_highest_bid_amount": current_highest_bid_amount,
             "bid_difference": bid_difference,
             "comments": comments,
+            "watchlist": watchlist_listings,
         },
     )
 
