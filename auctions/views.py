@@ -153,6 +153,7 @@ def get_winner(listing):
     return winner, winner_bid_amount
 
 
+@login_required
 def listing(request, listing_id):
     listing = Listing.objects.get(id=listing_id)
 
@@ -275,3 +276,21 @@ def end_bidding(request, listing_id):
 
     # Redirect back to the listing page
     return redirect("listing", listing_id=listing_id)
+
+
+@login_required
+def categories(request):
+    # Get all distinct categories from the Listing model
+    categories = Listing.objects.values_list("category", flat=True).distinct()
+
+    return render(request, "auctions/categories.html", {"categories": categories})
+
+
+@login_required
+def category(request, category):
+    # Get all active listings in the specified category
+    listings = Listing.objects.filter(category=category, active=True)
+
+    return render(
+        request, "auctions/category.html", {"category": category, "listings": listings}
+    )
