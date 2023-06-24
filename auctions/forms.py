@@ -15,7 +15,9 @@ class ListingForm(forms.ModelForm):
         ]
         widgets = {
             "starting_bid": forms.NumberInput(attrs={"min": 0, "step": 0.01}),
-            "deadline": forms.DateTimeInput(attrs={"type": "datetime-local"}),
+            "deadline": forms.DateTimeInput(
+                attrs={"type": "datetime-local", "step": 1}
+            ),
         }
 
     def save(self, commit=True):
